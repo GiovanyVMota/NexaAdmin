@@ -1,102 +1,107 @@
 import 'package:flutter/material.dart';
 import '../../models/product.dart';
 import '../../services/product_service.dart';
+import 'product_form_page.dart';
 
-class ProductFormPage extends StatefulWidget {
-  final ProductModel? product;
-
-  ProductFormPage({this.product});
+class ProductsPage extends StatefulWidget {
+  const ProductsPage({super.key});
 
   @override
-  _ProductFormPageState createState() => _ProductFormPageState();
+  State<ProductsPage> createState() => _ProductsPageState();
 }
 
-class _ProductFormPageState extends State<ProductFormPage> {
-  final formKey = GlobalKey<FormState>();
-  late TextEditingController nome;
-  late TextEditingController preco;
-  late TextEditingController estoque;
-  late TextEditingController categoria;
+class _ProductsPageState extends State<ProductsPage> {
+  late Future<List<ProductModel>> _futureProducts;
 
   @override
   void initState() {
     super.initState();
-    nome = TextEditingController(text: widget.product?.nome ?? "");
-    preco = TextEditingController(text: widget.product?.preco.toString() ?? "");
-    estoque =
-        TextEditingController(text: widget.product?.estoque.toString() ?? "");
-    categoria =
-        TextEditingController(text: widget.product?.categoria ?? "");
+    _refreshList();
+  }
+
+  void _refreshList() {
+    setState(() {
+      _futureProducts = ProductService.getProducts();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF0D0D0D),
+      backgroundColor: const Color(0xFF0D0D0D),
       appBar: AppBar(
-        title: Text(
-          widget.product == null ? "Novo Produto" : "Editar Produto",
-          style: TextStyle(color: Colors.white),
-        ),
+        title: const Text("Produtos", style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.black,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Form(
-          key: formKey,
-          child: Column(
-            children: [
-              _campo("Nome", nome),
-              SizedBox(height: 15),
-              _campo("Preço", preco, number: true),
-              SizedBox(height: 15),
-              _campo("Estoque", estoque, number: true),
-              SizedBox(height: 15),
-              _campo("Categoria", categoria),
-              SizedBox(height: 25),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueAccent),
-                child: Text("Salvar"),
-                onPressed: () async {
-                  if (!formKey.currentState!.validate()) return;
-
-                  final model = ProductModel(
-                    id: widget.product?.id,
-                    nome: nome.text,
-                    preco: double.parse(preco.text),
-                    estoque: int.parse(estoque.text),
-                    categoria: categoria.text,
-                  );
-
-                  if (widget.product == null) {
-                    await ProductService.createProduct(model);
-                  } else {
-                    await ProductService.updateProduct(model.id!, model);
-                  }
-
-                  Navigator.pop(context);
-                },
-              )
-            ],
-          ),
-        ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.purpleAccent,
+        child: const Icon(Icons.add, color: Colors.white),
+        onPressed: () async {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => ProductFormPage()),
+          );
+          _refreshList();
+        },
       ),
-    );
-  }
+      body: FutureBuilder<List<ProductModel>>(
+        future: _futureProducts,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(
+                child: Text("Erro: ${snapshot.error}",
+                    style: const TextStyle(color: Colors.white)));
+          }
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(
+                child: Text("Nenhum produto encontrado.",
+                    style: TextStyle(color: Colors.white70)));
+          }
 
-  Widget _campo(String label, TextEditingController c, {bool number = false}) {
-    return TextFormField(
-      controller: c,
-      keyboardType: number ? TextInputType.number : TextInputType.text,
-      style: TextStyle(color: Colors.white),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: TextStyle(color: Colors.white70),
-        enabledBorder:
-            OutlineInputBorder(borderSide: BorderSide(color: Colors.white30)),
-        focusedBorder:
-            OutlineInputBorder(borderSide: BorderSide(color: Colors.blueAccent)),
+          return ListView.builder(
+            itemCount: snapshot.data!.length,
+            itemBuilder: (context, index) {
+              final product = snapshot.data![index];
+              return ListTile(
+                title: Text(product.nome ?? "Sem nome",
+                    style: const TextStyle(color: Colors.white)),
+                subtitle: Text(
+                    "Estoque: ${product.estoque} | R\$ ${product.preco}",
+                    style: const TextStyle(color: Colors.white54)),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.edit, color: Colors.purpleAccent),
+                      onPressed: () async {
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) =>
+                                  ProductFormPage(product: product)),
+                        );
+                        _refreshList();
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.redAccent),
+                      onPressed: () async {
+                        if (product.id != null) {
+                          await ProductService.deleteProduct(product.id!);
+                          _refreshList();
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        },
       ),
     );
   }

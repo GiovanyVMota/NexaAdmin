@@ -22,8 +22,9 @@ class _ReportsPageState extends State<ReportsPage> {
 
   Future<void> loadData() async {
     try {
-      final clients = await ClientService().getClients();
-      final products = await ProductService().getProducts();
+      // CORREÇÃO AQUI: Removido os parênteses () pois os métodos são estáticos
+      final clients = await ClientService.getClients();
+      final products = await ProductService.getProducts();
 
       setState(() {
         totalClients = clients.length;
@@ -218,7 +219,6 @@ class FuturisticLineChartPainter extends CustomPainter {
       ..color = Colors.white12
       ..strokeWidth = 1;
 
-    // GRID
     for (double y = 0; y < size.height; y += 40) {
       canvas.drawLine(Offset(0, y), Offset(size.width, y), grid);
     }
@@ -227,7 +227,6 @@ class FuturisticLineChartPainter extends CustomPainter {
       canvas.drawLine(Offset(x, 0), Offset(x, size.height), grid);
     }
 
-    // Pontos do gráfico
     final points = [
       Offset(0, 150),
       Offset(50, 120),
@@ -255,10 +254,7 @@ class FuturisticLineChartPainter extends CustomPainter {
       path.lineTo(points[i].dx, points[i].dy);
     }
 
-    // Glow primeiro
     canvas.drawPath(path, glow);
-
-    // Linha principal por cima
     canvas.drawPath(path, line);
   }
 

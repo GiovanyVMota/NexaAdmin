@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
+import '../../models/product.dart';
 import '../../services/product_service.dart';
 
 class ProductFormPage extends StatefulWidget {
-  final Map? product;
+  final ProductModel? product;
 
-  const ProductFormPage({super.key, this.product});
+  ProductFormPage({this.product});
 
   @override
-  State<ProductFormPage> createState() => _ProductFormPageState();
+  _ProductFormPageState createState() => _ProductFormPageState();
 }
 
 class _ProductFormPageState extends State<ProductFormPage> {
-  final _formKey = GlobalKey<FormState>();
-  final ProductService service = ProductService();
-
+  final formKey = GlobalKey<FormState>();
   late TextEditingController nome;
   late TextEditingController preco;
   late TextEditingController estoque;
@@ -22,53 +21,83 @@ class _ProductFormPageState extends State<ProductFormPage> {
   @override
   void initState() {
     super.initState();
-
-    nome = TextEditingController(text: widget.product?["nome"] ?? "");
-    preco = TextEditingController(text: widget.product?["preco"] ?? "");
-    estoque = TextEditingController(text: widget.product?["estoque"].toString() ?? "");
-    categoria = TextEditingController(text: widget.product?["categoria"] ?? "");
+    nome = TextEditingController(text: widget.product?.nome ?? "");
+    preco = TextEditingController(text: widget.product?.preco.toString() ?? "");
+    estoque =
+        TextEditingController(text: widget.product?.estoque.toString() ?? "");
+    categoria =
+        TextEditingController(text: widget.product?.categoria ?? "");
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFF0D0D0D),
       appBar: AppBar(
-        title: Text(widget.product == null ? "Novo Produto" : "Editar Produto"),
+        title: Text(
+          widget.product == null ? "Novo Produto" : "Editar Produto",
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.black,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(20),
         child: Form(
-          key: _formKey,
+          key: formKey,
           child: Column(
             children: [
-              TextFormField(controller: nome, decoration: const InputDecoration(labelText: "Nome")),
-              TextFormField(controller: preco, decoration: const InputDecoration(labelText: "Preço")),
-              TextFormField(controller: estoque, decoration: const InputDecoration(labelText: "Estoque")),
-              TextFormField(controller: categoria, decoration: const InputDecoration(labelText: "Categoria")),
-              const SizedBox(height: 20),
-
+              _campo("Nome", nome),
+              SizedBox(height: 15),
+              _campo("Preço", preco, number: true),
+              SizedBox(height: 15),
+              _campo("Estoque", estoque, number: true),
+              SizedBox(height: 15),
+              _campo("Categoria", categoria),
+              SizedBox(height: 25),
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueAccent),
+                child: Text("Salvar", style: TextStyle(color: Colors.white)),
                 onPressed: () async {
-                  final data = {
-                    "nome": nome.text,
-                    "preco": preco.text,
-                    "estoque": int.parse(estoque.text),
-                    "categoria": categoria.text,
-                  };
+                  if (!formKey.currentState!.validate()) return;
+
+                  final model = ProductModel(
+                    id: widget.product?.id,
+                    nome: nome.text,
+                    preco: double.parse(preco.text),
+                    estoque: int.parse(estoque.text),
+                    categoria: categoria.text,
+                  );
 
                   if (widget.product == null) {
-                    await service.createProduct(data);
+                    await ProductService.createProduct(model);
                   } else {
-                    await service.updateProduct(widget.product!["id"], data);
+                    await ProductService.updateProduct(model.id!, model);
                   }
 
                   Navigator.pop(context);
                 },
-                child: const Text("Salvar"),
               )
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _campo(String label, TextEditingController c, {bool number = false}) {
+    return TextFormField(
+      controller: c,
+      keyboardType: number ? TextInputType.number : TextInputType.text,
+      style: TextStyle(color: Colors.white),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(color: Colors.white70),
+        enabledBorder:
+            OutlineInputBorder(borderSide: BorderSide(color: Colors.white30)),
+        focusedBorder:
+            OutlineInputBorder(borderSide: BorderSide(color: Colors.blueAccent)),
       ),
     );
   }

@@ -1,94 +1,105 @@
 import 'package:flutter/material.dart';
 import '../../models/client.dart';
 import '../../services/client_service.dart';
+import 'client_form_page.dart';
 
-class ClientFormPage extends StatefulWidget {
-  final ClientModel? client;
-
-  ClientFormPage({this.client});
+class ClientsPage extends StatefulWidget {
+  const ClientsPage({super.key});
 
   @override
-  _ClientFormPageState createState() => _ClientFormPageState();
+  State<ClientsPage> createState() => _ClientsPageState();
 }
 
-class _ClientFormPageState extends State<ClientFormPage> {
-  final formKey = GlobalKey<FormState>();
-  late TextEditingController nome;
-  late TextEditingController email;
-  late TextEditingController telefone;
+class _ClientsPageState extends State<ClientsPage> {
+  late Future<List<ClientModel>> _futureClients;
 
   @override
   void initState() {
     super.initState();
-    nome = TextEditingController(text: widget.client?.nome ?? "");
-    email = TextEditingController(text: widget.client?.email ?? "");
-    telefone = TextEditingController(text: widget.client?.telefone ?? "");
+    _refreshList();
+  }
+
+  void _refreshList() {
+    setState(() {
+      _futureClients = ClientService.getClients();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF0D0D0D),
+      backgroundColor: const Color(0xFF0D0D0D),
       appBar: AppBar(
-        title: Text(
-          widget.client == null ? "Novo Cliente" : "Editar Cliente",
-          style: TextStyle(color: Colors.white),
-        ),
+        title: const Text("Clientes", style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.black,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Form(
-          key: formKey,
-          child: Column(
-            children: [
-              _campo("Nome", nome),
-              SizedBox(height: 15),
-              _campo("E-mail", email),
-              SizedBox(height: 15),
-              _campo("Telefone", telefone),
-              SizedBox(height: 25),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueAccent),
-                child: Text("Salvar"),
-                onPressed: () async {
-                  if (!formKey.currentState!.validate()) return;
-
-                  final model = ClientModel(
-                    id: widget.client?.id,
-                    nome: nome.text,
-                    email: email.text,
-                    telefone: telefone.text,
-                  );
-
-                  if (widget.client == null) {
-                    await ClientService.createClient(model);
-                  } else {
-                    await ClientService.updateClient(model.id!, model);
-                  }
-
-                  Navigator.pop(context);
-                },
-              )
-            ],
-          ),
-        ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.blueAccent,
+        child: const Icon(Icons.add, color: Colors.white),
+        onPressed: () async {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => ClientFormPage()),
+          );
+          _refreshList();
+        },
       ),
-    );
-  }
+      body: FutureBuilder<List<ClientModel>>(
+        future: _futureClients,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(
+                child: Text("Erro: ${snapshot.error}",
+                    style: const TextStyle(color: Colors.white)));
+          }
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(
+                child: Text("Nenhum cliente encontrado.",
+                    style: TextStyle(color: Colors.white70)));
+          }
 
-  Widget _campo(String label, TextEditingController c) {
-    return TextFormField(
-      controller: c,
-      style: TextStyle(color: Colors.white),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: TextStyle(color: Colors.white70),
-        enabledBorder:
-            OutlineInputBorder(borderSide: BorderSide(color: Colors.white30)),
-        focusedBorder:
-            OutlineInputBorder(borderSide: BorderSide(color: Colors.blueAccent)),
+          return ListView.builder(
+            itemCount: snapshot.data!.length,
+            itemBuilder: (context, index) {
+              final client = snapshot.data![index];
+              return ListTile(
+                title: Text(client.nome ?? "Sem nome",
+                    style: const TextStyle(color: Colors.white)),
+                subtitle: Text(client.email ?? "",
+                    style: const TextStyle(color: Colors.white54)),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.edit, color: Colors.blueAccent),
+                      onPressed: () async {
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => ClientFormPage(client: client)),
+                        );
+                        _refreshList();
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.redAccent),
+                      onPressed: () async {
+                        if (client.id != null) {
+                          await ClientService.deleteClient(client.id!);
+                          _refreshList();
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        },
       ),
     );
   }
