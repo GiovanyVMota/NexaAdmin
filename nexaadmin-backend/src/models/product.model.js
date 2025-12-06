@@ -11,19 +11,23 @@ export const getById = async (id) => {
 };
 
 export const create = async (data) => {
-  const { nome, preco, estoque, categoria } = data;
+  // CORREÇÃO: Recebe descricao e data_atualizado em vez de estoque/categoria
+  const { nome, descricao, preco, data_atualizado } = data;
+  
   await pool.query(
-    "INSERT INTO produtos (nome, preco, estoque, categoria) VALUES (?, ?, ?, ?)",
-    [nome, preco, estoque, categoria]
+    "INSERT INTO produtos (nome, descricao, preco, data_atualizado) VALUES (?, ?, ?, ?)",
+    [nome, descricao, preco, data_atualizado]
   );
   return { message: "Produto criado!" };
 };
 
 export const update = async (id, data) => {
-  const { nome, preco, estoque, categoria } = data;
+  // CORREÇÃO: Atualiza os campos corretos no banco
+  const { nome, descricao, preco, data_atualizado } = data;
+  
   await pool.query(
-    "UPDATE produtos SET nome=?, preco=?, estoque=?, categoria=? WHERE id=?",
-    [nome, preco, estoque, categoria, id]
+    "UPDATE produtos SET nome=?, descricao=?, preco=?, data_atualizado=? WHERE id=?",
+    [nome, descricao, preco, data_atualizado, id]
   );
   return { message: "Produto atualizado!" };
 };
