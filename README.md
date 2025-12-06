@@ -1,113 +1,113 @@
-NexaAdmin - Sistema de Gestão ERP 🚀
+# 🚀 NexaAdmin – Sistema de Gestão ERP
 
-NexaAdmin é um ERP mobile desenvolvido em Flutter para gestão de Clientes e Produtos, integrado a um backend Node.js/Express com banco MySQL.
-Projeto final da disciplina Desenvolvimento Mobile II, com arquitetura limpa, design responsivo e elementos neon/glow futuristas.
+NexaAdmin é um ERP mobile desenvolvido em **Flutter** para gestão de **Clientes** e **Produtos**, integrado a um backend **Node.js/Express** com banco **MySQL**.  
+Projeto final da disciplina **Desenvolvimento Mobile II**, com arquitetura limpa, design responsivo e elementos neon/glow futuristas.
 
-👥 Equipe
+---
 
-Giovany V Mota
+## 🧩 Funcionalidades Principais
 
-Tallis Teixeira
+- 🔐 **Autenticação / Acesso**  
+  Controle de acesso ao sistema (login) para utilizar as funcionalidades do app.
 
-Marcos Rezende
+- 📊 **Dashboard Interativo**  
+  Contagem de clientes, produtos e gráficos de desempenho da empresa em tempo real.
 
-Hiago Vinicius
+- 👥 **Gestão de Clientes (CRUD completo)**  
+  - Listar clientes  
+  - Cadastrar novos clientes  
+  - Editar informações  
+  - Remover registros  
 
-✨ Funcionalidades Principais
+- 📦 **Gestão de Produtos**  
+  Controle de inventário, cadastro de produtos, atualização de estoque e gerenciamento de preços.
 
-📊 Dashboard Interativo: Contagem de clientes, produtos e gráficos de desempenho.
+- 📈 **Relatórios (em construção)**  
+  Módulo de relatórios com métricas de desempenho da empresa.
 
-👥 Clientes: CRUD completo (listar, cadastrar, editar, remover).
+- 🔗 **Integração Backend**  
+  Comunicação com API RESTful em tempo real, consumindo dados do servidor Node/Express.
 
-📦 Produtos: Gestão de inventário, controle de estoque e preços.
+- 🎨 **UI Moderna**  
+  Tema escuro, elementos neon/glow, layout responsivo e clean.
 
-📈 Relatórios: Métricas de desempenho da empresa (em construção).
+---
 
-🔗 Integração Backend: Comunicação via API RESTful em tempo real.
+## 👨‍💻 Equipe
 
-🎨 UI Moderna: Tema escuro, elementos neon/glow, responsivo e clean.
+- Giovany V Mota  
+- Tallis Teixeira  
+- Marcos Rezende  
+- Hiago Vinícius  
 
-🛠️ Tecnologias Utilizadas
-Tecnologia	Descrição	Link Oficial
-Flutter (Dart)	Construção do app mobile responsivo	flutter.dev
+---
 
-Node.js & Express	Backend RESTful	nodejs.org
- / expressjs.com
+## 🛠️ Tecnologias Utilizadas
 
-MySQL	Banco de dados relacional	mysql.com
+O projeto foi construído com as seguintes tecnologias e bibliotecas:
 
-Provider / Services	Gerenciamento de estado	pub.dev
+| Tecnologia              | Descrição                                                                 |
+| ----------------------- | ------------------------------------------------------------------------- |
+| **Flutter (Dart)**      | Construção do app mobile responsivo.                                     |
+| **Node.js & Express**   | Backend RESTful para regras de negócio e API.                            |
+| **MySQL**               | Banco de dados relacional para persistência das informações.             |
+| **Provider / Services** | Gerenciamento de estado e camada de serviços no Flutter.                 |
+| **HTTP / Axios**        | Comunicação HTTP entre o app e o backend (requisições REST).            |
 
-HTTP / Axios	Comunicação frontend-backend	axios-http.com
-⚙️ Como Executar o Projeto
-Pré-requisitos
+---
 
-Flutter SDK instalado ✅
+## ⚙️ Como Executar o Projeto
 
-Node.js e npm instalados ✅
+### ✅ Pré-requisitos
 
-Servidor MySQL rodando ✅
+- Flutter SDK instalado  
+- Node.js e npm instalados  
+- Servidor MySQL rodando  
 
-1️⃣ Configurar Banco de Dados
+---
 
-Crie um banco nexaadmin no MySQL.
+### 1️⃣ Configurar Banco de Dados
 
-Configure nexaadmin-backend/src/config/db.js com suas credenciais:
+1. Crie um banco chamado **`nexaadmin`** no MySQL.  
+2. Configure o arquivo `nexaadmin-backend/src/config/db.js` com suas credenciais:
 
+```js
 module.exports = {
   host: 'localhost',
   user: 'root',
   password: '',
-  database: 'nexaadmin'
+  database: 'nexaadmin',
 };
-
 2️⃣ Executar Backend
-cd nexaadmin-backend
+No diretório nexaadmin-backend:
+
+bash
+Copiar código
 npm install
 node src/server.js
-
-
 O servidor rodará na porta 3000.
 
-3️⃣ Executar Frontend (App)
-cd nexaadmin_frontend
+3️⃣ Executar App Mobile (Flutter)
+No diretório do app Flutter:
+
+bash
+Copiar código
 flutter pub get
-flutter run -d chrome
+flutter run
+Selecione o dispositivo/emulador desejado para rodar o NexaAdmin.
 
-
-Dica: Use -d chrome para demo rápida no navegador, ou rode no emulador Android/iOS.
-
-Estrutura do Projeto
-nexaadmin_frontend/
-│── lib/
-│   ├── models/      # Models do app
-│   ├── services/    # Comunicação API
-│   ├── pages/       # Telas do app
-│   └── main.dart    # Entry point
-nexaadmin-backend/
-│── src/
-│   ├── routes/      # Endpoints
-│   ├── controllers/ # Lógica das rotas
-│   ├── models/      # Models do banco
-│   └── server.js    # Entry point
-
-🔑 Variáveis de Ambiente (Opcional)
-
-Crie um .env no backend para segredos e configuração:
-
-DB_HOST=localhost
-DB_USER=root
-DB_PASSWORD=
-DB_NAME=nexaadmin
-PORT=3000
-
-
-🧑‍💻 Autores
-
-Giovany V Mota
-
-Tallis Teixeira
-
-Marcos Rezende
-
-Hiago Vinicius
+📂 Estrutura do Projeto (sugestão)
+text
+Copiar código
+nexaadmin/
+  ├── nexaadmin-app/          # Projeto Flutter
+  │   ├── lib/
+  │   ├── android/
+  │   └── ios/
+  └── nexaadmin-backend/      # Backend Node.js
+      ├── src/
+      │   ├── routes/
+      │   ├── controllers/
+      │   ├── models/
+      │   └── config/db.js
+      └── package.json
