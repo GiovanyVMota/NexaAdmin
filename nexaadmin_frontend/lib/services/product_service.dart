@@ -7,27 +7,38 @@ class ProductService {
 
   static Future<List<ProductModel>> getProducts() async {
     final res = await http.get(Uri.parse("$baseUrl/products"));
+    if (res.statusCode != 200) throw Exception("Erro ao buscar produtos");
+    
     final data = json.decode(res.body);
     return data.map<ProductModel>((e) => ProductModel.fromJson(e)).toList();
   }
 
   static Future<void> createProduct(ProductModel p) async {
-    await http.post(
+    final res = await http.post(
       Uri.parse("$baseUrl/products"),
       headers: {'Content-Type': 'application/json'},
       body: json.encode(p.toJson()),
     );
+    if (res.statusCode != 200) {
+      throw Exception("Erro ao criar: ${res.body}");
+    }
   }
 
   static Future<void> updateProduct(int id, ProductModel p) async {
-    await http.put(
+    final res = await http.put(
       Uri.parse("$baseUrl/products/$id"),
       headers: {'Content-Type': 'application/json'},
       body: json.encode(p.toJson()),
     );
+    if (res.statusCode != 200) {
+      throw Exception("Erro ao atualizar: ${res.body}");
+    }
   }
 
   static Future<void> deleteProduct(int id) async {
-    await http.delete(Uri.parse("$baseUrl/products/$id"));
+    final res = await http.delete(Uri.parse("$baseUrl/products/$id"));
+    if (res.statusCode != 200) {
+      throw Exception("Erro ao deletar");
+    }
   }
 }

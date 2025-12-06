@@ -25,6 +25,17 @@ class _ProductsPageState extends State<ProductsPage> {
     });
   }
 
+  // Formata a data para exibir bonitinho
+  String _formatDate(String dateStr) {
+    if (dateStr.isEmpty) return "Data não disponível";
+    try {
+      final date = DateTime.parse(dateStr);
+      return "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year} às ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}";
+    } catch (e) {
+      return dateStr;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,7 +51,7 @@ class _ProductsPageState extends State<ProductsPage> {
         onPressed: () async {
           await Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => ProductFormPage()),
+            MaterialPageRoute(builder: (_) => const ProductFormPage()),
           );
           _refreshList();
         },
@@ -49,54 +60,109 @@ class _ProductsPageState extends State<ProductsPage> {
         future: _futureProducts,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator(color: Colors.purpleAccent));
           }
           if (snapshot.hasError) {
-            return Center(
-                child: Text("Erro: ${snapshot.error}",
-                    style: const TextStyle(color: Colors.white)));
+            return Center(child: Text("Erro: ${snapshot.error}", style: const TextStyle(color: Colors.white)));
           }
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(
-                child: Text("Nenhum produto encontrado.",
-                    style: TextStyle(color: Colors.white70)));
+            return const Center(child: Text("Nenhum produto encontrado.", style: TextStyle(color: Colors.white70)));
           }
 
           return ListView.builder(
             itemCount: snapshot.data!.length,
+            padding: const EdgeInsets.all(12),
             itemBuilder: (context, index) {
               final product = snapshot.data![index];
-              return ListTile(
-                title: Text(product.nome ?? "Sem nome",
-                    style: const TextStyle(color: Colors.white)),
-                subtitle: Text(
-                    "Estoque: ${product.estoque} | R\$ ${product.preco}",
-                    style: const TextStyle(color: Colors.white54)),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.edit, color: Colors.purpleAccent),
-                      onPressed: () async {
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) =>
-                                  ProductFormPage(product: product)),
-                        );
-                        _refreshList();
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.delete, color: Colors.redAccent),
-                      onPressed: () async {
-                        if (product.id != null) {
-                          await ProductService.deleteProduct(product.id!);
-                          _refreshList();
-                        }
-                      },
-                    ),
-                  ],
+              
+              return Card(
+                color: const Color(0xFF1E1E1E),
+                shape: RoundedRectangleBorder(
+                  side: BorderSide(color: Colors.purpleAccent.withOpacity(0.3), width: 1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                margin: const EdgeInsets.only(bottom: 12),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              product.nome,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            "R\$ ${product.preco.toStringAsFixed(2)}",
+                            style: const TextStyle(
+                              color: Colors.purpleAccent,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      
+                      // AQUI ESTÁ A DESCRIÇÃO
+                      Text(
+                        product.descricao.isNotEmpty ? product.descricao : "Sem descrição",
+                        style: const TextStyle(color: Colors.white70, fontSize: 14),
+                      ),
+                      
+                      const SizedBox(height: 12),
+                      const Divider(color: Colors.white10),
+                      const SizedBox(height: 8),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          // AQUI ESTÁ A DATA DE ATUALIZAÇÃO
+                          Row(
+                            children: [
+                              const Icon(Icons.access_time, size: 14, color: Colors.white38),
+                              const SizedBox(width: 4),
+                              Text(
+                                "Atualizado: ${_formatDate(product.dataAtualizado)}",
+                                style: const TextStyle(color: Colors.white38, fontSize: 12),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.edit, color: Colors.blueAccent, size: 20),
+                                onPressed: () async {
+                                  await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (_) => ProductFormPage(product: product)),
+                                  );
+                                  _refreshList();
+                                },
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.delete, color: Colors.redAccent, size: 20),
+                                onPressed: () async {
+                                  if (product.id != null) {
+                                    await ProductService.deleteProduct(product.id!);
+                                    _refreshList();
+                                  }
+                                },
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               );
             },

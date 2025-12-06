@@ -11,19 +11,21 @@ export const getById = async (id) => {
 };
 
 export const create = async (data) => {
-  const { nome, email, telefone, cidade } = data;
+  // CORREÇÃO: Usando os campos novos do PDF
+  const { nome, sobrenome, email, idade, foto } = data;
   await pool.query(
-    "INSERT INTO clientes (nome, email, telefone, cidade) VALUES (?, ?, ?, ?)",
-    [nome, email, telefone, cidade]
+    "INSERT INTO clientes (nome, sobrenome, email, idade, foto) VALUES (?, ?, ?, ?, ?)",
+    [nome, sobrenome, email, idade, foto]
   );
   return { message: "Cliente criado!" };
 };
 
 export const update = async (id, data) => {
-  const { nome, email, telefone, cidade } = data;
+  // CORREÇÃO: Usando os campos novos no Update também
+  const { nome, sobrenome, email, idade, foto } = data;
   await pool.query(
-    "UPDATE clientes SET nome=?, email=?, telefone=?, cidade=? WHERE id=?",
-    [nome, email, telefone, cidade, id]
+    "UPDATE clientes SET nome=?, sobrenome=?, email=?, idade=?, foto=? WHERE id=?",
+    [nome, sobrenome, email, idade, foto, id]
   );
   return { message: "Cliente atualizado!" };
 };

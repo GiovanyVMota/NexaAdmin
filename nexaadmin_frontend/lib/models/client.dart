@@ -1,30 +1,39 @@
 class ClientModel {
   int? id;
   String nome;
+  String sobrenome;
   String email;
-  String telefone;
+  int idade;
+  String foto;
 
   ClientModel({
     this.id,
     required this.nome,
+    required this.sobrenome,
     required this.email,
-    required this.telefone,
+    required this.idade,
+    required this.foto,
   });
 
   factory ClientModel.fromJson(Map<String, dynamic> json) {
     return ClientModel(
       id: json['id'],
-      nome: json['nome'],
-      email: json['email'],
-      telefone: json['telefone'],
+      nome: json['nome'] ?? '',
+      sobrenome: json['sobrenome'] ?? '',
+      email: json['email'] ?? '',
+      // Garante que a idade seja um número inteiro
+      idade: int.tryParse(json['idade'].toString()) ?? 0,
+      foto: json['foto'] ?? '',
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'nome': nome,
+      'sobrenome': sobrenome,
       'email': email,
-      'telefone': telefone,
+      'idade': idade,
+      'foto': foto,
     };
   }
 }
