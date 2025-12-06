@@ -40,20 +40,33 @@ Projeto final da disciplina **Desenvolvimento Mobile II**, com arquitetura limpa
 
 ## ⚙️ Como Executar o Projeto
 
-### 1️⃣ Configurar Banco de Dados
+### 🗄️ 1️⃣ Configuração do Banco de Dados
 
-1. Crie um banco chamado **nexaadmin** no MySQL.
+Esta etapa é essencial para garantir o correto funcionamento da API backend. Abaixo, apresenta-se o script SQL responsável pela criação do banco de dados, das tabelas e de registros iniciais utilizados para testes.
+
+#### 📘 Script SQL Oficial do Projeto
+
+Execute o seguinte script no MySQL Workbench, DBeaver ou terminal MySQL:
+
+```sql
+-- =====================================================
+--  CRIAÇÃO DO BANCO DE DADOS
+-- =====================================================
 CREATE DATABASE IF NOT EXISTS nexaadmin;
 USE nexaadmin;
 
--- Limpar tabelas antigas (caso existam)
+-- =====================================================
+--  REMOÇÃO DE TABELAS EXISTENTES (CASO EXISTA CONFLITO)
+-- =====================================================
 DROP TABLE IF EXISTS relatorios;
 DROP TABLE IF EXISTS produtos;
 DROP TABLE IF EXISTS clientes;
 DROP TABLE IF EXISTS clients;
 DROP TABLE IF EXISTS products;
 
--- Tabela CLIENTES
+-- =====================================================
+--  TABELA: CLIENTES
+-- =====================================================
 CREATE TABLE clientes (
   id INT AUTO_INCREMENT PRIMARY KEY,
   nome VARCHAR(100) NOT NULL,
@@ -64,7 +77,9 @@ CREATE TABLE clientes (
   criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Tabela PRODUTOS
+-- =====================================================
+--  TABELA: PRODUTOS
+-- =====================================================
 CREATE TABLE produtos (
   id INT AUTO_INCREMENT PRIMARY KEY,
   nome VARCHAR(120) NOT NULL,
@@ -74,7 +89,9 @@ CREATE TABLE produtos (
   criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Tabela RELATÓRIOS (opcional)
+-- =====================================================
+--  TABELA: RELATÓRIOS (OPCIONAL)
+-- =====================================================
 CREATE TABLE relatorios (
   id INT AUTO_INCREMENT PRIMARY KEY,
   titulo VARCHAR(150),
@@ -82,33 +99,26 @@ CREATE TABLE relatorios (
   criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Clientes de exemplo
+-- =====================================================
+--  DADOS INICIAIS PARA TESTE — CLIENTES
+-- =====================================================
 INSERT INTO clientes (nome, sobrenome, email, idade, foto) VALUES
 ('Ana', 'Martins', 'ana.martins@example.com', 28, 'https://i.pravatar.cc/150?img=1'),
 ('Lucas', 'Gomes', 'lucas.gomes@example.com', 35, 'https://i.pravatar.cc/150?img=3'),
 ('Mariana', 'Oliveira', 'mariana.oliveira@example.com', 22, 'https://i.pravatar.cc/150?img=5');
 
--- Produtos de exemplo
+-- =====================================================
+--  DADOS INICIAIS PARA TESTE — PRODUTOS
+-- =====================================================
 INSERT INTO produtos (nome, descricao, preco, data_atualizado) VALUES
 ('Teclado Mecânico RGB', 'Teclado gamer com switches azuis e iluminação RGB.', 359.90, '2023-10-25T14:30:00.000'),
-('Mouse Gamer 7200 DPI', 'Mouse gamer com alta precisão e botões programáveis.', 129.90, '2023-11-01T10:00:00.000'),
-('Monitor 24\" 144Hz', 'Monitor com alta taxa de atualização para jogos.', 1299.00, '2023-11-10T09:15:00.000');
-
-
-2. Configure o arquivo `nexaadmin-backend/src/config/db.js` com suas credenciais:
-
-```js
-module.exports = {
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'nexaadmin',
-};
+('Mouse Gamer 7200 DPI', 'Alta precisão e botões programáveis.', 129.90, '2023-11-01T10:00:00.000'),
+('Monitor 24" 144Hz', 'Alta taxa de atualização indicada para jogos competitivos.', 1299.00, '2023-11-10T09:15:00.000');
 ```
 
 ---
 
-### 2️⃣ Executar Backend
+### ▶️ 2️⃣ Executando o Backend
 
 No diretório **nexaadmin-backend**:
 
@@ -117,20 +127,20 @@ npm install
 node src/server.js
 ```
 
-O servidor rodará na porta **3000**.
+O servidor iniciará na porta **3000**.
 
 ---
 
-### 3️⃣ Executar App Mobile (Flutter)
+### 📱 3️⃣ Executando o Aplicativo Flutter
 
-No diretório do app Flutter:
+No diretório **nexaadmin-app**:
 
 ```bash
 flutter pub get
 flutter run
 ```
 
-Selecione um dispositivo/emulador para rodar o NexaAdmin.
+Selecione o dispositivo/emulador disponível.
 
 ---
 
